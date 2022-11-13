@@ -1,9 +1,0 @@
-Munmun is the student of Computer Science and Engineering.
-Number of vowels: 19
-Number of consonants: 30
-Vowels are in the putting string is: uuieueooueieeaEieei
-Consonants are in the putting string is: MnmnsthstdntfCmptrScncndngnrng
-
-
-Words started with vowel : is of and Engineering. 
-Words started with consonant : Munmun the student Computer Science 

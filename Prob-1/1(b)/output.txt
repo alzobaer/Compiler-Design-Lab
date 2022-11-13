@@ -1,4 +1,0 @@
-Words = 7
-Letters = 21
-Digits = 11
-Characters = 42
