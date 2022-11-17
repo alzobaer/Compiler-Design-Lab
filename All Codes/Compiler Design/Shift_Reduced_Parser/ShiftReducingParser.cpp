@@ -21,7 +21,7 @@ void check(){
 			cout << "$\t" << "REDUCE E->a";
 			check();
 		}
-		else if(i + 2 < stck.size() && (stck[i] == 'E' && (stck[i+1] == '+' || stck[i+1] == '-' || stck[i+1] == '*' || stck[i+1] == '/') && stck[i+2] == 'E')){
+		if(i + 2 < stck.size() && (stck[i] == 'E' && (stck[i+1] == '+' || stck[i+1] == '-' || stck[i+1] == '*' || stck[i+1] == '/') && stck[i+2] == 'E')){
 			stck.pop_back();
 			stck.pop_back();
 			printStackAndInput();
@@ -33,16 +33,14 @@ void check(){
                 cout<<"$\t" << "REDUCE E->E-E";
             else if(stck[i+1] == '/')
                 cout<<"$\t" << "REDUCE E->E/E";
-			check();
 		}
-		else if(i+2 < stck.size() && stck[i] == '(' && stck[i+1] == 'E' && stck[i+2] == ')'){
+		if(i+2 < stck.size() && stck[i] == '(' && stck[i+1] == 'E' && stck[i+2] == ')'){
 			stck.pop_back();
 			stck.pop_back();
 			stck.pop_back();
 			stck.push_back('E');
 			printStackAndInput();
 			cout << "$\t" << "Reduce E -> (E)";
-			check();
 		}
 	}
 }
@@ -55,6 +53,8 @@ int main(){
 		getline(cin, str);
 		if(str == "#")
 			return 0;
+		//string str = "(a+a)";
+		//cout << endl << "Input String: " << str << endl;
 
 		int sz = str.size();
 		cout << endl << "Shift Reduce Parser: " << endl;

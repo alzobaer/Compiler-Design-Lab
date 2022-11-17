@@ -48,7 +48,7 @@ int main(){
         st.push_back(a[i]);
         a[i] = ' '; // replace element with space so that it not visible in output
         StackAndInput();
-        cout << "$\t" << "SHIFT->" << st.back();
+        cout << "$\t" << "SHIFT->" << st.back();  //print last element of vector in action
         check();
     }
     if(st.size() == 1 && st[0] == 'E')

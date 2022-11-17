@@ -1,143 +1,77 @@
-#include <bits/stdc++.h>
+// Shift Reduce Parser
+#include<bits/stdc++.h>
 using namespace std;
-ifstream readFIle("firstfollowinput.txt");
+ifstream readFIle("input.txt");
+ofstream writeFile("output.txt");
 
-map<char, vector<string>> productionRules;
-map<char, set<char>> first, follow;
-set<char> nonTerminal;
-set<char> isVisited;
+vector <char> st;
+vector <char> input_str_copy;
 
-void printProductionRule(){
-    cout << "Production rule is: " << endl;
-    for (auto itr = productionRules.begin(); itr != productionRules.end(); ++itr){
-        cout << itr->first << "->";
+void printStackAndInp(){
+    cout << "\n$";
+    for(auto x : st)
+        cout << x;
+    cout << "\t\t";
+    for(auto x : input_str_copy)
+        cout << x;
+    cout << "$";
+}
 
-        for (auto ptr : itr->second){
-            cout << ptr << " ";
+void checkReduced(){
+    for(int i = 0; i < st.size(); i ++){
+        if(st[i] == 'a' || st[i] == '2' || st[i] == '3' || st[i] == '4'){
+            st[i] = 'E';
+            printStackAndInp();
+            cout << "\t\tReduce E->a";
+            checkReduced();
         }
-
-        cout << endl;
-    }
-    cout << endl;
-}
-
-void insertProduction(string prod){
-    productionRules[prod[0]].push_back(prod.substr(3));
-    nonTerminal.insert(prod[0]);
-}
-
-void takeInput(){
-    int numberOfProduction;
-    readFIle >> numberOfProduction;
-    for (int i = 0; i < numberOfProduction; i++){
-        string prod;
-        readFIle >> prod;
-        insertProduction(prod);
-    }
-}
-
-bool isCapital(char ch){
-    if (ch >= 'A' && ch <= 'Z'){
-        return true;
-    }
-
-    return false;
-}
-
-void getFirst(char ch){
-    if (isVisited.count(ch))
-        return;
-    isVisited.insert(ch);
-
-    for (string production : productionRules[ch]){
-        if (isCapital(production[0])){
-            getFirst(production[0]);
-            for (char child : first[production[0]]){
-                first[ch].insert(child);
-            }
+        else if(i+2 < st.size() && st[i] == 'E' && (st[i+1] == '+' || st[i+1] == '*' || st[i+1] == '-' || st[i+1] == '/') && st[i+2] == 'E'){
+            st.pop_back();
+            st.pop_back();
+            printStackAndInp();
+            if(st[i+1] == '+')
+                cout << "\t\tReduce E->E+E";
+            else if(st[i+1] == '-')
+                cout << "\t\tReduce E->E-E";
+            if(st[i+1] == '*')
+                cout << "\t\tReduce E->E*E";
+            else if(st[i+1] == '/')
+                cout << "\t\tReduce E->E/E";
+            checkReduced();
         }
-        else
-            first[ch].insert(production[0]);
-    }
-}
-
-void printFirst(){
-    cout << "First:\n";
-    for (char ch : nonTerminal){
-        cout << ch << " ->";
-        for (char x : first[ch])
-            cout << " " << x;
-        cout << endl;
-    }
-}
-void calFirst(){
-    for (char ch : nonTerminal){
-        if (isVisited.count(ch))
-            continue;
-        getFirst(ch);
-    }
-    printFirst();
-    isVisited.clear();
-}
-
-void getFollow(char ch){
-    if (isVisited.count(ch))
-        return;
-    isVisited.insert(ch);
-    for (char left : nonTerminal){
-        for (string production : productionRules[left]){
-            int len = production.size();
-            bool isGet = false;
-            for (int i = 0; i < len; i++){
-                if (isGet){
-                    if (isCapital(production[i])){
-                        for (char x : first[production[i]]){
-                            follow[ch].insert(x);
-                        }
-                        if (first[production[i]].count('e')){
-                            continue;
-                        }
-                        else
-                            isGet = false;
-                    }
-                    else{
-                        follow[ch].insert(production[i]);
-                        isGet = false;
-                    }
-                    continue;
-                }
-                if (production[i] == ch){
-                    isGet = true;
-                }
-            }
-            if(isGet){
-                getFollow(left);
-                for(auto x: follow[left]){
-                    follow[ch].insert(x);
-                }
-            }
+        else if(i+2 < st.size() && st[i] == '(' && st[i+1] == 'E' && st[i+2] == ')'){
+            st.pop_back();
+            st.pop_back();
+            st.pop_back();
+            st.push_back('E');
+            printStackAndInp();
+            cout << "\t\tReduce E->(E)";
+            checkReduced();
         }
     }
-    follow[ch].erase('e');
 }
-
 int main(){
-    takeInput();    // cout << "e is for epsilon";
-    calFirst();// printProductionRule();
+        cout << "Grammar is: \n E -> E + E \n E -> E - E \n E -> E * E \n E -> E / E \n E -> (E) \n E -> a|2|3|4\n"; //Context Free Grammar
+        string inp_str = "2+(3*(4+2))";
+        //cin >> inp_str;
+        for(int i = 0; i < inp_str.size(); i++)
+            input_str_copy.push_back(inp_str[i]);
 
-    follow['S'].insert('$');
-    for (auto ch : nonTerminal){
-        if (isVisited.count(ch))
-            continue;
-        getFollow(ch);
-    }
-    cout << "\n\n\nFollow:\n";
-    for(char ch: nonTerminal){
-        cout << ch << "-> ";
-        for(char x: follow[ch]){
-            cout << x <<" ";
+        cout << "Input string: " << inp_str;
+        cout << "\n\nStack\t\tInput\t\tAction";
+
+        for(int i = 0; i < input_str_copy.size(); i++){
+            st.push_back(input_str_copy[i]);
+            input_str_copy[i] = ' ';
+            printStackAndInp();
+            cout << "\t\tShift E->" << st.back();
+            checkReduced();
         }
+        cout << "\nResult:  ";
+        if(st.size() == 1 && st[0] == 'E')
+            cout << "String is Accepted";
+        else
+            cout << "Rejected";
         cout << endl;
-    }
     return 0;
 }
